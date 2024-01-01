@@ -1,0 +1,25 @@
+.avatar-upload {
+  position: relative;
+  max-width: 205px;
+  margin-left: 60px;
+  .avatar-edit {
+    position: absolute;
+    right: 0px;
+    z-index: 1;
+    top: 2px;
+    background-color: rgb(196, 196, 196);
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    input {
+      display: none;
+      + label {
+        display: inline-block;
+        width: 34px;
+        height: 34px;
+        border-radius: 100%;
+        background: #ffffff;
+      }
+    }
+  }
+}

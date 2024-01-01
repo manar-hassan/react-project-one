@@ -6,28 +6,28 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  useTheme,
   IconButton,
   Box,
 } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import HomeIcon from "@mui/icons-material/Home";
 import CreateIcon from "@mui/icons-material/Create";
-import { Brightness4, Brightness7 } from "@mui/icons-material";
+import { AccountBox, Brightness4, Brightness7 } from "@mui/icons-material";
 const Drawerr = ({
   drawerWidth,
   setmyMode,
   blockOrNone,
   drawerType,
   closeDrawer,
+  theme
 }) => {
   const navigate = useNavigate();
-  const theme = useTheme();
   const currentLocation = useLocation();
 
   const myList = [
     { text: "Home", icon: <HomeIcon />, path: "/" },
     { text: "Create", icon: <CreateIcon />, path: "/create" },
+    { text: "Profile", icon: <AccountBox />, path: "/profile" },
   ];
   return (
     <Box component="nav">
@@ -75,6 +75,7 @@ const Drawerr = ({
           {myList.map((item) => {
             return (
               <ListItem
+              // className="listBg"
                 key={item.text}
                 disablePadding
                 sx={{
@@ -98,7 +99,7 @@ const Drawerr = ({
 
       
         </List>
-        <Divider />
+
       </Drawer>
     </Box>
   );

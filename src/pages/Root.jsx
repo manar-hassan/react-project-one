@@ -1,12 +1,13 @@
-import React, { useState } from "react";
+import { useMemo, useState } from "react";
 import { Outlet } from "react-router-dom";
-import Appbar from "../MUI-Component/Appbar";
+import Appbar from "../MUI-Component/appbar/Appbar";
 import Drawerr from "../MUI-Component/Drawerr";
 import { Box, CssBaseline, ThemeProvider, createTheme } from "@mui/material";
-import { grey } from "@mui/material/colors";
+import getDesignTokens from "../styles/myTheme";
 
 const drawerWidth = 240;
 const Root = () => {
+
   const [mode, setmyMode] = useState(
     localStorage.getItem("currentMode") === null
       ? "light"
@@ -14,28 +15,9 @@ const Root = () => {
       ? "light"
       : "dark"
   );
-  const darkTheme = createTheme({
-    palette: {
-      mode,
-      ...(mode === "light"
-        ? {
-            createBtn: {
-              main: "#647488",
-            },
-            drawerrGrey: {
-              main: grey[300],
-            },
-          }
-        : {
-            createBtn: {
-              main: "#teal",
-            },
-            drawerrGrey: {
-              main: grey[700],
-            },
-          }),
-    },
-  });
+  const theme = useMemo(() => createTheme(getDesignTokens(mode)), [mode]);
+
+
   const [blockOrNone, setblockOrNone] = useState("none");
   const [drawerType, setdrawerType] = useState("permanent");
   const showDrawer = () => {
@@ -46,15 +28,21 @@ const Root = () => {
     setblockOrNone("none");
     setdrawerType("permanent");
   };
+  
   return (
-    <ThemeProvider theme={darkTheme}>
+    <ThemeProvider theme={theme}>
       <CssBaseline />
-      <div>
-        <Appbar
-        {...{drawerWidth,showDrawer}}
-        />
+      <div className={theme.palette.mode}>
+        <Appbar {...{ drawerWidth, showDrawer }} />
         <Drawerr
-        {...{drawerWidth,setmyMode,blockOrNone,drawerType,closeDrawer}}
+          {...{
+            drawerWidth,
+            setmyMode,
+            blockOrNone,
+            drawerType,
+            closeDrawer,
+            theme
+          }}
         />
 
         <Box
@@ -65,7 +53,11 @@ const Root = () => {
             justifyContent: "center",
           }}
         >
-          <Outlet />
+        
+          <Outlet/>
+
+          
+          
         </Box>
       </div>
     </ThemeProvider>

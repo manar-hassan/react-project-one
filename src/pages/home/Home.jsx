@@ -1,71 +1,80 @@
-import { React, useState, useEffect } from "react";
 import "./Home.css";
-import { Box, Paper, Typography, IconButton } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
+import { Box, Typography, Stack, Button } from "@mui/material";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "/react/react-project-one/src/firebase/config";
+import { Link } from "react-router-dom";
+import { Favorite, Warning } from "@mui/icons-material";
+import { sendEmailVerification } from "firebase/auth";
+import Items from "./items";
+import Loading from "../loading/Loading";
+import ErrorComponent from "../error/ErrorComponent";
+import { Helmet } from "react-helmet-async";
 
 const Home = () => {
-  const [mydata, setmydata] = useState([]);
-  useEffect(() => {
-    fetch("http://localhost:3100/mydata")
-      .then((response) => response.json())
-      .then((data) => setmydata(data));
-  }, []);
-  const handleDelete = (item) => {
-    fetch(`http://localhost:3100/mydata/${item.id}`, {
-      method: "DELETE",
-    });
-    const newArr = mydata.filter((myObj) => {
-      return myObj.id !== item.id;
-    });
-    setmydata(newArr);
-  };
-  let totalPrice = 0;
-  return (
-    <Box sx={{ width: "366px" }}>
-      {mydata.map((item) => {
-        totalPrice += item.price;
-        return (
-          <Paper
-            key={item.id}
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              mt: "22px",
-              pt: "27px",
-              bm: "7px",
-              position: "relative",
+  const [user, loading, error] = useAuthState(auth);
+
+  if (!user && !loading) {
+    return (
+      <Box sx={{ my: "10%" }}>
+        <Stack direction={"row"}>
+          <Typography className="typoColor" textAlign="center" variant="h4">
+            please{" "}
+            <Link to="/signin" className="link">
+              sign-in
+            </Link>{" "}
+            to continue
+          </Typography>
+          <Favorite sx={{ fontSize: "35px" }} color="error" />
+        </Stack>
+      </Box>
+    );
+  }
+  if (loading) {
+    return <Loading />;
+  }
+
+  if (user) {
+    if (!user.emailVerified) {
+      return (
+        <Box sx={{ my: "10%" }}>
+          <Stack direction={"row"}>
+            <Typography className="typoColor" textAlign="center" variant="h4">
+              please verfied your email to continue
+            </Typography>
+            <Warning sx={{ fontSize: "35px", ml: 1 }} color="warning" />
+          </Stack>
+          <Button
+            variant="contained"
+            sx={{ bgcolor: "red", color: "white", mx: "40%", mt: 3 }}
+            onClick={() => {
+              sendEmailVerification(auth.currentUser).then(() => {
+                console.log("email done");
+              });
             }}
           >
-            <Typography variant="h6" sx={{ ml: "16px", fontSize: "1.3em" }}>
-              {item.title}
-            </Typography>
-            <Typography
-              variant="h6"
-              sx={{
-                mr: "33px",
-                fontSize: "1.4em",
-                opacity: "0.8",
-                fontWeight: 500,
-              }}
-            >
-              ${item.price}
-            </Typography>
-            <IconButton
-              onClick={() => {
-                handleDelete(item);
-              }}
-              sx={{ position: "absolute", top: "0", right: "0" }}
-            >
-              <CloseIcon sx={{ fontSize: "20px" }} />
-            </IconButton>
-          </Paper>
-        );
-      })}
-      <Typography mt="30px" textAlign="center" variant="h5">
-        &#128073; You spend ${totalPrice}
-      </Typography>
-    </Box>
-  );
+            Send Again
+          </Button>
+        </Box>
+      );
+    }
+    if (user.emailVerified) {
+      
+      return (
+        <Box>
+<Helmet>
+  <title>expendence | Home</title>
+  <link rel="canonical" href="https://www.tacobell.com/" />
+</Helmet>
+      <Items user={user} />
+        </Box>
+        
+      );
+    }
+  }
+
+  if (error) {
+    return <ErrorComponent />;
+  }
 };
 
 export default Home;
